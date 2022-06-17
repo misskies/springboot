@@ -3,22 +3,48 @@ package com.example.demo.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-@TableName(value = "sys_user")
-public class User {
-    @TableId(type = IdType.AUTO)
-    private Integer id;
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author liu
+ * @since 2022-06-16
+ */
+@Getter
+@Setter
+  @TableName("sys_user")
+@ApiModel(value = "User对象", description = "")
+@ToString
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+      @ApiModelProperty("ID")
+        @TableId(value = "id", type = IdType.AUTO)
+      private Integer id;
+
     private String username;
-    @JsonIgnore
+
     private String password;
+
     private String nickname;
+
     private String email;
+
     private String phone;
+
     private String address;
+
+    private LocalDateTime createTime;
+
 
 }
