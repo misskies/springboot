@@ -8,11 +8,15 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.common.Constants;
+import com.example.demo.common.Result;
 import com.example.demo.controller.dto.UserDTO;
+import com.example.demo.utils.TokenUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+//import com.example.demo.entity.User;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
@@ -41,17 +45,29 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping("/login")
-    public  boolean login(@RequestBody UserDTO userDto)
+    public Result login(@RequestBody UserDTO userDto)
     {
         String username=userDto.getUsername();
         String password=userDto.getPassword();
         if(StrUtil.isBlank(username)||StrUtil.isBlank(password))
         {
-            return false;
+            return Result.error(Constants.CODE_400,"参数错误");
         }
-        return userService.login(userDto);
+        UserDTO dto=userService.login(userDto);
+        return Result.success(dto);
     }
 
+    @PostMapping("/register")
+    public  Result register(@RequestBody UserDTO userDTO)
+    {
+        String username=userDTO.getUsername();
+        String password=userDTO.getPassword();
+        if(StrUtil.isBlank(username)||StrUtil.isBlank(password)) {
+            return Result.error(Constants.CODE_400, "参数错误");
+        }
+        return Result.success(userService.register(userDTO));
+        //return userService.register(userDTO);
+    }
     @PostMapping
     public  boolean save(@RequestBody User user)
          {
@@ -77,6 +93,14 @@ public class UserController {
             return userService.getById(id);
             }
 
+    @GetMapping("/username/{username}")
+    public Result findOne(@PathVariable String username) {
+        QueryWrapper<User>  queryWrapper= new QueryWrapper<>();
+        queryWrapper.eq("username",username);
+        return Result.success(userService.getOne(queryWrapper));
+    }
+
+
     @GetMapping("/page")
     public Page<User> findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
@@ -97,6 +121,9 @@ public class UserController {
         {
             queryWrapper.like("address",address);
         }
+//
+//        User currentUser=TokenUtils.getCurrentUser();
+//        System.out.println(currentUser.getNickname());
         return userService.page(new Page<>(pageNum, pageSize),queryWrapper);
     }
     @GetMapping("/export")
