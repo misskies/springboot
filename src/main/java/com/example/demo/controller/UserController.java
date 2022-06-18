@@ -69,29 +69,29 @@ public class UserController {
         //return userService.register(userDTO);
     }
     @PostMapping
-    public  boolean save(@RequestBody User user)
-         {
-            return userService.saveOrUpdate(user);
-         }
+    public  Result save(@RequestBody User user)
+    {
+        return Result.success(userService.saveOrUpdate(user));
+    }
 
     @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Integer id) {
-            return userService.removeById(id);
-            }
+    public Result delete(@PathVariable Integer id) {
+        return Result.success(userService.removeById(id));
+    }
     @PostMapping("/del/batch")
-    public boolean deleteBatch(@RequestBody List<Integer> ids)
-        {
-            return userService.removeByIds(ids);
-        }
+    public Result deleteBatch(@RequestBody List<Integer> ids)
+    {
+        return Result.success(userService.removeByIds(ids));
+    }
     @GetMapping
-    public List<User> findAll() {
-            return userService.list();
-            }
+    public Result findAll() {
+        return Result.success(userService.list());
+    }
 
     @GetMapping("/{id}")
-    public User findOne(@PathVariable Integer id) {
-            return userService.getById(id);
-            }
+    public Result findOne(@PathVariable Integer id) {
+        return Result.success(userService.getById(id));
+    }
 
     @GetMapping("/username/{username}")
     public Result findOne(@PathVariable String username) {
@@ -102,11 +102,11 @@ public class UserController {
 
 
     @GetMapping("/page")
-    public Page<User> findPage(@RequestParam Integer pageNum,
-                               @RequestParam Integer pageSize,
-                               @RequestParam(defaultValue = "")String username,
-                               @RequestParam(defaultValue = "") String email,
-                               @RequestParam(defaultValue = "") String address) {
+    public Result findPage(@RequestParam Integer pageNum,
+                           @RequestParam Integer pageSize,
+                           @RequestParam(defaultValue = "")String username,
+                           @RequestParam(defaultValue = "") String email,
+                           @RequestParam(defaultValue = "") String address) {
         QueryWrapper<User> queryWrapper=new QueryWrapper<>();
         //queryWrapper.orderByDesc("id");
         if(!"".equals(username))
@@ -121,10 +121,7 @@ public class UserController {
         {
             queryWrapper.like("address",address);
         }
-//
-//        User currentUser=TokenUtils.getCurrentUser();
-//        System.out.println(currentUser.getNickname());
-        return userService.page(new Page<>(pageNum, pageSize),queryWrapper);
+        return Result.success(userService.page(new Page<>(pageNum, pageSize),queryWrapper));
     }
     @GetMapping("/export")
     public void export(HttpServletResponse response) throws Exception{
@@ -158,7 +155,7 @@ public class UserController {
      * @throws Exception
      */
     @PostMapping("/import")
-    public Boolean imp(MultipartFile file) throws Exception {
+    public Result imp(MultipartFile file) throws Exception {
         InputStream inputStream = file.getInputStream();
         ExcelReader reader = ExcelUtil.getReader(inputStream);
         // 方式1：(推荐) 通过 javabean的方式读取Excel内的对象，但是要求表头必须是英文，跟javabean的属性要对应起来
@@ -178,7 +175,7 @@ public class UserController {
             users.add(user);
         }
         userService.saveBatch(users);
-        return true;
+        return Result.success(true);
     }
 }
 
