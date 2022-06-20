@@ -45,6 +45,8 @@ public class Menu implements Serializable {
       @ApiModelProperty("父子关系")
       private Integer pid;
       @TableField(exist = false)
-      private List<Menu> chilren;
+      private List<Menu> children;
+
+      private String pagePath;
 
 }

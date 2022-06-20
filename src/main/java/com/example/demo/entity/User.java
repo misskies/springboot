@@ -48,5 +48,8 @@ public class User implements Serializable {
 
     private LocalDateTime createTime;
 
+    @ApiModelProperty("角色")
+    private String role;
+
 
 }
