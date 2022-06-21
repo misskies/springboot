@@ -42,5 +42,7 @@ public class Goods implements Serializable {
       @ApiModelProperty("库存")
       private Integer inventory;
 
+      private String avatar_url;
+
 
 }
