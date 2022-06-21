@@ -42,6 +42,8 @@ public class GoodsController {
     @PostMapping
     public  Result save(@RequestBody Goods goods)
          {
+            Goods good = goodsService.getById(goods.getId());
+            goods.setInventory(good.getInventory()-goods.getInventory());
             return Result.success(goodsService.saveOrUpdate(goods));
          }
 
