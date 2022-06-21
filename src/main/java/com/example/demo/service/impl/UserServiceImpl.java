@@ -106,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 roleMeuns.add(menu);
             }
             List<Menu > children =menu.getChildren();
-            children.removeIf(child ->menuIds.contains(child.getId()));
+            children.removeIf(child ->!menuIds.contains(child.getId()));
         }
         return (roleMeuns);
 

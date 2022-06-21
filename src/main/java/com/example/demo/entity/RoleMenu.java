@@ -6,6 +6,6 @@ import lombok.Data;
 @TableName("sys_role_menu")
 @Data
 public class RoleMenu {
-    private Integer roleID;
+    private Integer roleId;
     private Integer menuId;
 }

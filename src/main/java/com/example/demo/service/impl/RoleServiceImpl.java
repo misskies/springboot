@@ -46,13 +46,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
             {
                 //补上父级id
                 RoleMenu roleMenu= new RoleMenu();
-                roleMenu.setRoleID(roleId);
+                roleMenu.setRoleId(roleId);
                 roleMenu.setMenuId(menu.getPid());
                 roleMenuMapper.insert(roleMenu);
                 menuIdsCopy.add(menu.getPid());
             }
            RoleMenu roleMenu= new RoleMenu();
-           roleMenu.setRoleID(roleId);
+           roleMenu.setRoleId(roleId);
            roleMenu.setMenuId(menuId);
            roleMenuMapper.insert(roleMenu);
 

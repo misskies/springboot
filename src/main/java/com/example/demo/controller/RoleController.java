@@ -64,13 +64,13 @@ public class RoleController {
             return Result.success(roleService.page(new Page<>(pageNum, pageSize),queryWrapper));
         }
     @PostMapping("/roleMenu/{roleId}")//绑定角色和菜单
-    public Result roleMenu(@RequestBody Integer roleId,@RequestBody List<Integer> menuIds)
+    public Result roleMenu(@PathVariable Integer roleId,@RequestBody List<Integer> menuIds)
     {
         roleService.setRoleMenu(roleId,menuIds);
         return Result.success();
     }
     @GetMapping("/roleMenu/{roleId}")//绑定角色和菜单
-    public Result roleMenu(@RequestBody Integer roleId)
+    public Result getRoleMenu(@PathVariable Integer roleId)
     {
 
         return Result.success(roleService.getRoleMenu(roleId));
