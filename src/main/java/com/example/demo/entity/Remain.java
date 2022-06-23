@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -22,29 +20,26 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-  @TableName("sys_sale")
-@ApiModel(value = "Sale对象", description = "")
-public class Sale implements Serializable {
+  @TableName("sys_remain")
+@ApiModel(value = "Remain对象", description = "")
+public class Remain implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
       @TableId(value = "id", type = IdType.AUTO)
       private Integer id;
 
-    private String salemsg;
+    private String msgtype;
 
     private String name;
 
     private String type;
 
-      @ApiModelProperty("单价")
-      private double oprice;
+    private Double iprice;
 
-      @ApiModelProperty("总价")
-      private double allprice;
+    private Double oprice;
 
-      @ApiModelProperty("数量")
-      private Integer num;
+    private Integer inventory;
 
     private LocalDateTime createTime;
 

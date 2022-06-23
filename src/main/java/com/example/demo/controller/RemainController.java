@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.Result;
 import com.example.demo.entity.Goods;
 import com.example.demo.entity.User;
+import com.example.demo.service.IGoodsService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -19,8 +20,8 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
 
-import com.example.demo.service.ISaleService;
-import com.example.demo.entity.Sale;
+import com.example.demo.service.IRemainService;
+import com.example.demo.entity.Remain;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,79 +35,100 @@ import org.springframework.web.multipart.MultipartFile;
  * @since 2022-06-21
  */
 @RestController
-@RequestMapping("/sale")
-public class SaleController {
+@RequestMapping("/remain")
+public class RemainController {
 
 
     @Resource
-    private ISaleService saleService;
+    private IRemainService remainService;
+    @Resource
+    private IGoodsService goodsService;
 
+    @PostMapping
+    public  Result save(@RequestBody Remain remain)
+         {
+            return Result.success(remainService.saveOrUpdate(remain));
+         }
     @PostMapping("/check")
     public  Result save(@RequestBody Goods goods)
     {
-        Sale sale=new Sale();
-        sale.setName(goods.getName());
-        sale.setType(goods.getType());
-        sale.setOprice(goods.getOprice());
-        sale.setNum(goods.getInventory());
-        sale.setSalemsg("销售信息");
-        sale.setAllprice(sale.getNum()*sale.getOprice());
-        return Result.success(saleService.saveOrUpdate(sale));
+        Remain remain=new Remain();
+        Goods good =goodsService.getById(goods.getId());
+        if(good!=null)
+        {
+            remain.setMsgtype("库存信息修改");
+        }
+        else
+        {
+            remain.setMsgtype("新增库存信息");
+        }
+        remain.setName(goods.getName());
+        remain.setType(goods.getType());
+        remain.setIprice(goods.getIprice());
+        remain.setOprice(goods.getOprice());
+        remain.setInventory(goods.getInventory());
+        return Result.success(remainService.saveOrUpdate(remain));
     }
 
-    @PostMapping
-    public  Result save(@RequestBody Sale sale)
+    @PostMapping("/dele")
+    public  Result del(@RequestBody Goods goods)
     {
-        sale.setSalemsg("销售信息");
-        sale.setAllprice(sale.getNum()*sale.getOprice());
-        return Result.success(saleService.saveOrUpdate(sale));
+        Remain remain=new Remain();
+        remain.setMsgtype("删除库存信息");
+        remain.setName(goods.getName());
+        remain.setType(goods.getType());
+        remain.setIprice(goods.getIprice());
+        remain.setOprice(goods.getOprice());
+        remain.setInventory(goods.getInventory());
+        return Result.success(remainService.saveOrUpdate(remain));
     }
 
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Integer id) {
-        return Result.success(saleService.removeById(id));
-    }
+            return Result.success(remainService.removeById(id));
+            }
     @PostMapping("/del/batch")
     public Result deleteBatch(@RequestBody List<Integer> ids)
-    {
-        return Result.success(saleService.removeByIds(ids));
-    }
+        {
+            return Result.success(remainService.removeByIds(ids));
+        }
     @GetMapping
     public Result findAll() {
-        return Result.success(saleService.list());
-    }
+            return Result.success(remainService.list());
+            }
 
     @GetMapping("/{id}")
     public Result findOne(@PathVariable Integer id) {
-        return Result.success(saleService.getById(id));
-    }
+            return Result.success(remainService.getById(id));
+            }
 
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
                            @RequestParam Integer pageSize,
                            @RequestParam String name) {
-        QueryWrapper<Sale> queryWrapper =new QueryWrapper<>();
-        queryWrapper.like("name",name);
-        return Result.success(saleService.page(new Page<>(pageNum, pageSize),queryWrapper));
+            QueryWrapper<Remain> queryWrapper =new QueryWrapper<>();
+            queryWrapper.like("name",name);
+            return Result.success(remainService.page(new Page<>(pageNum, pageSize),queryWrapper));
     }
+
     @GetMapping("/export")
     public void export(HttpServletResponse response) throws Exception{
-        List<Sale> list =saleService.list();
+        List<Remain> list =remainService.list();
         //写出到浏览器
         ExcelWriter writer = ExcelUtil.getWriter(true);
         writer.addHeaderAlias("id","ID");
-        writer.addHeaderAlias("salemsg","信息");
+        writer.addHeaderAlias("msgtype","信息类别");
         writer.addHeaderAlias("name","商品名");
-        writer.addHeaderAlias("type","类型");
+        writer.addHeaderAlias("type","商品类型");
+        writer.addHeaderAlias("iprice","进价");
         writer.addHeaderAlias("oprice","售价");
-        writer.addHeaderAlias("num","数量");
-        writer.addHeaderAlias("allprice","总价");
+        writer.addHeaderAlias("inventory","数量");
         writer.addHeaderAlias("createTime","     创建时间    ");
         //一次性写出list内对象，强制输出标题
         writer.write(list,true);
         //设置浏览器响应的格式
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("销售信息", "UTF-8");
+        String fileName = URLEncoder.encode("入库信息", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out=response.getOutputStream();
@@ -129,38 +151,22 @@ public class SaleController {
 
         // 方式2：忽略表头的中文，直接读取表的内容
         List<List<Object>> list = reader.read(1);
-        List<Sale> sales = CollUtil.newArrayList();
+        List<Remain> remains = CollUtil.newArrayList();
         for (List<Object> row : list) {
-            Sale sale = new Sale();
-            sale.setName(row.get(1).toString());
-            sale.setSalemsg("销售信息");
-            sale.setType(row.get(2).toString());
-            sale.setOprice(Double.parseDouble(row.get(3).toString()));
-            sale.setNum(Integer.parseInt(row.get(4).toString()));
-            sale.setAllprice(Double.parseDouble(row.get(5).toString()));
-            sales.add(sale);
+            Remain remain = new Remain();
+            remain.setMsgtype(row.get(1).toString());
+            remain.setName(row.get(2).toString());
+
+            remain.setType(row.get(3).toString());
+
+            remain.setIprice(Double.parseDouble(row.get(4).toString()));
+            remain.setOprice(Double.parseDouble(row.get(5).toString()));
+
+            remain.setInventory(Integer.parseInt(row.get(6).toString()));
+            remains.add(remain);
         }
-        saleService.saveBatch(sales);
+        remainService.saveBatch(remains);
         return Result.success(true);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 

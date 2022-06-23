@@ -42,10 +42,17 @@ public class GoodsController {
     @PostMapping
     public  Result save(@RequestBody Goods goods)
          {
-            Goods good = goodsService.getById(goods.getId());
-            goods.setInventory(good.getInventory()-goods.getInventory());
             return Result.success(goodsService.saveOrUpdate(goods));
          }
+
+
+    @PostMapping("/check")
+    public  Result saveiv(@RequestBody Goods goods)
+    {
+        Goods good = goodsService.getById(goods.getId());
+        goods.setInventory(good.getInventory()-goods.getInventory());
+        return Result.success(goodsService.saveOrUpdate(goods));
+    }
 
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Integer id) {
@@ -68,9 +75,10 @@ public class GoodsController {
 
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
-                                    @RequestParam Integer pageSize) {
+                           @RequestParam Integer pageSize,
+                           @RequestParam String name) {
     QueryWrapper<Goods> queryWrapper =new QueryWrapper<>();
-
+    queryWrapper.like("name",name);
             return Result.success(goodsService.page(new Page<>(pageNum, pageSize),queryWrapper));
         }
             @GetMapping("/export")
